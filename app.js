@@ -2,7 +2,8 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const multer = require('multer');
-//const fs = require('fs');
+const fs = require('fs');
+const decompress = require("decompress");
 const port = 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -50,6 +51,28 @@ const upload = multer({ storage: storage });
 app.post('/upload', upload.single('file'), (req, res) => {
   // req.file contains the uploaded file details
   // req.body contains other form data if any
+
+  var fext = path.extname(req.file.originalname);
+  const fname = req.file.path;
+
+  fext = fext.trim().toLowerCase();
+  if (fext === '.zip'){
+    decompress(fname, "uploads")
+        .then((files) => {
+          console.log(files);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+  }
+
+
+
+
+
+
+  console.log( path.extname(req.file.originalname));
   res.send('File uploaded successfully');
 });
 
